@@ -26,9 +26,9 @@ Para el proyecto se utilizan las siguientes bibliotecas:
 * Desde el editor de python, abrir el archivo Ejemplo_Tkinter.py y
 * Desde linea de comandos ingresar a la carpeta Taller-Tkinter y ejecutar el siguiente código:
 
-"""
+```
 Taller-Tkinter>python Ejemplo_Tkinter.py
-"""
+```
 
 
 ## Autores
