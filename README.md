@@ -20,7 +20,6 @@ Para el proyecto se utilizan las siguientes bibliotecas:
   * Threading
   * Winsound
   * os
-  * random
   * time  
 ### Ejecutar el Código
 * Desde el editor de python, abrir el archivo Ejemplo_Tkinter.py y
