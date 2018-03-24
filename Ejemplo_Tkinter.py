@@ -1,32 +1,29 @@
-"""
-____________________________________________
-Tutorías de taller de programación          *
+about ="""
+___________________________________________
+Instituto Tecnologico de Costa Rica         *
+Computer Engineering                        *
+Tutorías taller de programación             *
                                             *
+Milton Villegas Lemus                       * 
 Ejemplo de música en Windows                *
 Juego destrucción de misiles                *
-Version de python: 3.6.0                    *
+                                            *
 Santiago Gamboa Ramírez                     *
-2017                                        *
+fecha de emision: 05/03/2018                *
+Version: 1.0.0                              *
 ____________________________________________*
 """
+
 #           _____________________________
 #__________/BIBLIOTECAS
-from tkinter import *
-from threading import Thread
-import threading
-import winsound
-import os
-import random
-import time
-from tkinter import messagebox
+from tkinter import *               # Tk(), Label, Canvas, Photo
+from threading import Thread        # p.start()
+import threading                    # 
+import winsound                     # Playsound
+import os                           # ruta = os.path.join('')
+import time                         # time.sleep(x)
+from tkinter import messagebox      # AskYesNo ()
 
-#           ____________________________
-#__________/Código
-
-#           ____________________________
-#__________/Variable global
-global flag_back #Si se desea parar un hilo antes de que se termine la ejecución
-global flag_misil #Capturar que se tocó la pantalla y se debe destruir el misil del hilo
 
 #           ____________________________
 #__________/Función para cargar imagenes
@@ -51,19 +48,20 @@ root.resizable(width=NO,height=NO)
 
 #           ______________________________
 #__________/Se crea un lienzo para objetos
-C_root=Canvas(root, width=800,height=600, bg='black')
+C_root=Canvas(root, width=800,height=600, bg='white')
 C_root.place(x=0,y=0)
 
 #           ______________________________
 #__________/Se crea una Etiqueta con un título
-L_titulo=Label(C_root,text='Instituto Tecnologico de Costa Rica\nComputer Engineering\nMilton Villegas Lemus\n\nSantiago Gamboa Ramírez\n2014092362\nVersion: 1.0.0\nfecha de emision:\n05/03/2018\n',font=('Agency FB',14),bg='green',fg='white')
-L_titulo.place(x=560,y=10)
+
+L_titulo=Label(C_root,text=about,font=('Agency FB',14),bg='white',fg='black')
+L_titulo.place(x=550,y=10)
 #           _____________________________________
 #__________/Se crea una entrada de texto y titulo
-L_titulo=Label(C_root,text="Ingrese su nombre:",font=('Agency FB',14),bg='green',fg='white')
-L_titulo.place(x=560,y=300)
+L_ingresarNombre = Label(C_root,text="Ingrese su nombre:",font=('Agency FB',14),bg='white',fg='green')
+L_ingresarNombre.place(x=560,y=400)
 E_nombre = Entry(C_root,width=20,font=('Agency FB',14))
-E_nombre.place(x=560,y=340)
+E_nombre.place(x=560,y=425)
 
 #           ____________________________
 #__________/Cargar una imagen
@@ -99,11 +97,8 @@ def play1():
 
 #           ____________________________
 #__________/Crear una nueva ventana
-def VentanaJuego(Entry_nombre):
-    #Esta variable viene de la pantalla anterior y se obtiene el nombre ingresado.
-    #Si el Entry E_nombre se destruye produce un error
-    nombre = str(Entry_nombre.get())
-    #Esconder la pantallasin destruirla
+def VentanaJuego(nombre_jugador):
+    #Esconder la pantalla sin destruirla
     root.withdraw()
     #Pantalla secundaria
     juego=Toplevel()
@@ -119,27 +114,31 @@ def VentanaJuego(Entry_nombre):
     F_juego.photo=fondoImg
     F_juego.place(x=0,y=0)
 
-    L_nombre=Label(C_juego, text="Jugador: "+nombre ,font=('Agency FB',20), fg='light blue', bg='white')
+    L_nombre=Label(C_juego, text="Jugador: "+nombre_jugador ,font=('Agency FB',20), fg='light blue', bg='white')
     L_nombre.place(x=10,y=10)
 
-
+#           ___________________________________
+#__________/Variables globales para control de los hilos
+    global flag_base_destruida, flag_misil
+    flag_base_destruida = False
+    flag_misil=True
 
 #           ___________________________________
-#__________/Función que ejecuta 20 veces el hilo
-    def crearmilsil():
+#__________/Función que ejecuta 15 veces el hilo
+    def crearmisil(i):
+        global flag_misil , flag_base_destruida
+        flag_misil = True
+        flag_base_destruida = False      
+        
+        img_misil=cargarImg('bomba.gif')
+        misil=Label(C_juego, image=img_misil,bg='light blue')
+        misil.photo=img_misil
 
-        img_bomba=cargarImg('bomba.gif')
-        bomba=Label(C_juego, image=img_bomba,bg='light blue')
-        bomba.photo=img_bomba
-
-#           _____________________________
-#__________/Bandera para detener el misil
-        global flag_misil
-        flag_misil=True
-        posx= random.randrange(50,750)
-        velocidad_misil=random.randrange(1,4)
+       
+        posx= 50 * i
         posy=0
-        bomba.place(x=posx,y=0)
+        misil.place(x=posx,y=0)
+        
 
 #           ______________________________________
 #__________/Capturar un click sobre el label bomba
@@ -147,35 +146,41 @@ def VentanaJuego(Entry_nombre):
             global flag_misil
             flag_misil=False
 
-        bomba.bind('<Button-1>',onClick)
+        misil.bind('<Button-1>',onClick)
 
 #           ____________________________
 #__________/Funcion que mueve un misil
-        while(posy<490 and flag_misil and (not pausa)):
-            posy+=velocidad_misil
-            bomba.place(x=posx,y=posy)
+        
+        def move_misilAux(misil,posy, posx):
+            misil.place(x=posx,y=posy)
             time.sleep(0.02)
-
-        destruido=False
-        if (not pausa):
-            bomba.destroy()
-            if(posy>=490):
-                destruido=True
-        return destruido
-
+            global flag_misil , flag_base_destruida
+            if(posy>490):
+                flag_misil = False
+                flag_base_destruida = True
+                return
+            if(flag_misil):
+                return move_misilAux(misil, posy+2, posx)
+        
+        move_misilAux(misil, posy, posx)
+        if(flag_base_destruida):
+            misil.destroy()
+            return True
+        else:
+            misil.destroy()
+            return False
+            
+        
 #           ___________________________________
-#__________/Ciclo del hilo que crea los misiles
+#__________/Funcion que es llamada con el hilo
     def ataque():
-        global pausa
-        pausa=False
         result=True
         i = 0
-        while(i<=20):
-            if(pausa):
-                break
-            if(crearmilsil()):
+        while(i<16):
+            if(crearmisil(i)):
                 result=False
                 break
+            
             i+=1
         if(result and i>=20):
             print("Felicidades has ganado")
@@ -204,23 +209,30 @@ def VentanaJuego(Entry_nombre):
 #           ____________________________
 #__________/Boton volver pantalla juego
 
-    Btn_back = Button(C_juego,text='Atras',command=back,bg='white',fg='blue')
+    Btn_back = Button(C_juego,text='Atras',command=back,bg='white',fg='green')
     Btn_back.place(x=100,y=560)
 
 
 
 #           ____________________________
+#__________/Función del botón juego
+def empezar_juego():
+    #Obtener el nombre de un entry
+    nombre = str(E_nombre.get())
+    VentanaJuego(nombre)
+#           ____________________________
 #__________/Botones de ventana principal
 
-Btn_song1 = Button(C_root,text='Cancion 1',command=play1,bg='white',fg='blue')
+Btn_hilos = Button(C_root,text='Juego',command=empezar_juego,fg='white',bg='green')
+Btn_hilos.place(x=560,y=470)
+
+Btn_song1 = Button(C_root,text='Cancion 1',command=play1,bg='green',fg='white')
 Btn_song1.place(x=100,y=550)
 
-Btn_song2=Button(C_root,text='Cancion 2',command=play2,bg='white',fg='blue')
+Btn_song2=Button(C_root,text='Cancion 2',command=play2,bg='green',fg='white')
 Btn_song2.place(x=200,y=550)
 
-Btn_mute=Button(C_root,text='Parar ',command=off,bg='white',fg='blue')
+Btn_mute=Button(C_root,text='Parar ',command=off,fg='white',bg='green')
 Btn_mute.place(x=300,y=550)
 
-Btn_hilos = Button(C_root,text='Ejemplo',command=lambda: VentanaJuego(E_nombre),bg='white',fg='green')
-Btn_hilos.place(x=560,y=370)
 root.mainloop()
