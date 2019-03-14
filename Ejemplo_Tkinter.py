@@ -54,8 +54,8 @@ C_root.place(x=0,y=0)
 #           ______________________________
 #__________/Se crea una Etiqueta con un título
 
-L_titulo=Label(C_root,text=about,font=('Agency FB',14),bg='white',fg='black')
-L_titulo.place(x=550,y=10)
+L_titulo=Label(C_root,text=about,font=('Agency FB',12),bg='white',fg='black')
+L_titulo.place(x=490,y=10)
 #           _____________________________________
 #__________/Se crea una entrada de texto y titulo
 L_ingresarNombre = Label(C_root,text="Ingrese su nombre:",font=('Agency FB',14),bg='white',fg='green')
@@ -67,7 +67,7 @@ E_nombre.place(x=560,y=425)
 #__________/Cargar una imagen
 CE=cargarImg("logo.gif")
 imagen_cancion=Label(C_root,bg='white')
-imagen_cancion.place(x=50,y=10)
+imagen_cancion.place(x=20,y=10)
 imagen_cancion.config(image=CE)
 
 #           ____________________________
@@ -160,7 +160,7 @@ def VentanaJuego(nombre_jugador):
                 flag_base_destruida = True
                 return
             if(flag_misil):
-                return move_misilAux(misil, posy+2, posx)
+                return move_misilAux(misil, posy+3, posx)
         
         move_misilAux(misil, posy, posx)
         if(flag_base_destruida):
@@ -174,15 +174,10 @@ def VentanaJuego(nombre_jugador):
 #           ___________________________________
 #__________/Funcion que es llamada con el hilo
     def ataque():
-        result=True
         i = 0
-        while(i<16):
-            if(crearmisil(i)):
-                result=False
-                break
-            
-            i+=1
-        if(result and i>=20):
+        result = ataque_aux(i)
+        
+        if(result):
             print("Felicidades has ganado")
             messagebox.showinfo("Felicidades", "Felicidades has ganado!!")
         else:
@@ -191,6 +186,18 @@ def VentanaJuego(nombre_jugador):
             if(yesno):
                 p=Thread(target=ataque,args=())
                 p.start()
+
+    def ataque_aux(i):
+        print("creando misil", i)
+        if(i>=16):
+            return True
+        elif(crearmisil(i)):
+            return False
+        else:
+            return True * ataque_aux(i+1)
+            
+            
+        
 
 #           _____________________________
 #__________/Volver a la ventana principal
